@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For My Jan 💜</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;text-align:center;font-family:Georgia,serif;color:#593078;background:linear-gradient(160deg,#fbf8ff,#eadbfa);padding:20px}
+.panel{max-width:550px;margin:18px auto;padding:25px 18px;background:#ffffffdf;border:1px solid #e7d6f5;border-radius:25px;box-shadow:0 10px 30px #633a8120}
+h1{font-size:42px;color:#7542a0}
+h2{color:#7542a0}
+p{font:15px/1.7 Arial;color:#725b83}
+button{border:0;border-radius:30px;padding:13px 19px;margin:7px;background:linear-gradient(135deg,#a77bd0,#70409a);color:white;font-weight:bold;font-size:14px}
+.bear{font-size:55px}
+.envelope{font-size:55px;cursor:pointer}
+.letter{display:none;background:#fbf6ff;padding:18px;border-radius:15px;line-height:1.8;font-family:Arial}
+.letter.show{display:block}
+.balloons{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+.balloon{width:65px;height:85px;border-radius:50%;font-size:25px;background:#a87bd0}
+.balloon:nth-child(2){background:#d98fca}
+.balloon:nth-child(3){background:#8c70bd}
+.balloon:nth-child(4){background:#c49be5}
+.balloon.popped{visibility:hidden}
+#gift{font:15px/1.7 Arial;margin:15px}
+#candles{font-size:30px}
+.small{font:12px Arial;color:#967eaa}
+.float{position:fixed;bottom:-50px;animation:rise 12s linear infinite;pointer-events:none}
+@keyframes rise{to{transform:translateY(-120vh)}}
+</style>
+</head>
+<body>
+<div class="float" style="left:10%">💜</div>
+<div class="float" style="left:85%;animation-delay:4s">🎈</div>
+
+<section class="panel">
+<div class="bear">🧸💜🧸</div>
+<p>A little surprise made for you</p>
+<h1>Happy Birthday,<br>My Jan!</h1>
+<p>Someone as special as you deserves a little extra magic today. ✨</p>
+</section>
+
+<section class="panel">
+<h2>Open your letter 💌</h2>
+<p>Tap the heart to open your birthday letter.</p>
+<div class="envelope" onclick="openLetter()">💌 ❤️</div>
+<button onclick="openLetter()">Open my letter</button>
+<div class="letter" id="letter">
+<strong>To My Jan, 💜</strong><br><br>
+Happy Birthday! I hope your day is filled with happiness, laughter, and beautiful little surprises. May the year ahead bring you peace, success, and countless reasons to smile. Keep being the wonderful person you are. You deserve all the good things life has to offer.
+<br><br><strong>Have the loveliest birthday! 🎂✨</strong>
+</div>
+</section>
+
+<section class="panel">
+<h2>Little gifts for you 🎁</h2>
+<p>Touch each balloon and discover your surprise!</p>
+<div class="balloons">
+<button class="balloon" onclick="pop(this,'🎁 May your biggest dreams come true!')">♥</button>
+<button class="balloon" onclick="pop(this,'💌 You make ordinary days feel special.')">♥</button>
+<button class="balloon" onclick="pop(this,'🌟 May happiness find you every day.')">♥</button>
+<button class="balloon" onclick="pop(this,'🧸 Sending warm birthday wishes your way!')">♥</button>
+</div>
+<div id="gift"></div>
+<div class="bear">🧸 🎀 🧸</div>
+</section>
+
+<section class="panel">
+<h2>Time for cake! 🎂</h2>
+<div id="candles">🕯️ 🕯️ 🕯️</div>
+<p class="small">Blow gently toward your phone or press the button!</p>
+<button onclick="blow()">Blow candles 💨</button>
+<button onclick="mic()">Use microphone 🎤</button>
+<p id="status" class="small">Make a beautiful birthday wish! 💜</p>
+</section>
+<p class="small">Made with warm birthday wishes • Purple dreams 💜</p>
+
+<script>
+function openLetter(){
+document.getElementById('letter').classList.add('show');
+confetti();
+}
+function pop(el,msg){
+el.classList.add('popped');
+document.getElementById('gift').textContent=msg;
+confetti();
+}
+function confetti(){
+for(let i=0;i<25;i++){
+let s=document.createElement('span');
+s.textContent=['💜','✨','🎉','🎊'][Math.floor(Math.random()*4)];
+s.style.cssText=`position:fixed;left:${Math.random()*100}vw;top:-25px;font-size:25px;z-index:9;transition:transform 2s,opacity 2s`;
+document.body.appendChild(s);
+requestAnimationFrame(()=>{s.style.transform=`translateY(100vh) rotate(360deg)`;s.style.opacity=0});
+setTimeout(()=>s.remove(),2100);
+}
+}
+function blow(){
+document.getElementById('candles').textContent='✨ ✨ ✨';
+document.getElementById('status').textContent='Your candles are out! Make a beautiful wish. 💜';
+confetti();
+}
+async function mic(){
+try{
+let stream=await navigator.mediaDevices.getUserMedia({audio:true});
+let ctx=new AudioContext();
+let src=ctx.createMediaStreamSource(stream);
+let a=ctx.createAnalyser();
+a.fftSize=512;
+src.connect(a);
+let d=new Uint8Array(a.fftSize),count=0;
+document.getElementById('status').textContent='Microphone on! Blow gently toward your phone.';
+function check(){
+a.getByteTimeDomainData(d);
+let sum=0;
+for(let v of d){let n=(v-128)/128;sum+=n*n}
+let rms=Math.sqrt(sum/d.length);
+count=rms>.10?count+1:Math.max(0,count-1);
+if(count>=5){blow();stream.getTracks().forEach(t=>t.stop());ctx.close();return}
+requestAnimationFrame(check);
+}
+check();
+}catch(e){
+document.getElementById('status').textContent='Microphone unavailable. Please use the Blow candles button.';
+}
+}
+</script>
+</body>
+</html>
